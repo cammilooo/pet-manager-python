@@ -1,6 +1,12 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      { source: '/auth/:path*', destination: '/', permanent: false },
+      { source: '/team', destination: '/', permanent: false },
+    ]
+  },
   async headers() {
     return [
       {
