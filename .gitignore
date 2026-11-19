@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+
+# Local database files may contain personal records.
+*.sqlite
+*.sqlite3
+*.db
+
+# Local configuration and generated exports.
+.env
+*.xlsx
+
+# Editor settings can contain machine-specific paths.
+.vscode/
