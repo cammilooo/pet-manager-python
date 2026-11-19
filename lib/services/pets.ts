@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export type PetKind = 'Dog' | 'Cat'
 export type HealthStatus = 'Sick' | 'Healthy' | 'In Surgery'
@@ -61,7 +61,7 @@ export function parsePetInput(value: unknown): PetInput | null {
 }
 
 export async function listPets(supabase?: SupabaseClient): Promise<PetRecord[]> {
-  const client = supabase ?? (await createClient())
+  const client = supabase ?? createAdminClient()
   const [petResult, dogResult, catResult] = await Promise.all([
     client.from('tb_pet').select('id, code, name, born_year, color, health_status'),
     client.from('tb_dog').select('id, breed, pedigree, id_pet'),
@@ -106,7 +106,7 @@ export async function listPets(supabase?: SupabaseClient): Promise<PetRecord[]> 
 }
 
 export async function createPet(input: PetInput, supabase?: SupabaseClient) {
-  const client = supabase ?? (await createClient())
+  const client = supabase ?? createAdminClient()
   const { data: pet, error: petError } = await client
     .from('tb_pet')
     .insert({
@@ -133,7 +133,7 @@ export async function createPet(input: PetInput, supabase?: SupabaseClient) {
 }
 
 export async function updatePet(id: number, input: PetInput, supabase?: SupabaseClient) {
-  const client = supabase ?? (await createClient())
+  const client = supabase ?? createAdminClient()
   const { data: currentPet, error: lookupError } = await client
     .from('tb_pet')
     .select('id')
@@ -176,7 +176,7 @@ export async function updatePet(id: number, input: PetInput, supabase?: Supabase
 }
 
 export async function deletePet(id: number, supabase?: SupabaseClient) {
-  const client = supabase ?? (await createClient())
+  const client = supabase ?? createAdminClient()
   const { data: currentPet, error: lookupError } = await client
     .from('tb_pet')
     .select('id')

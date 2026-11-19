@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export interface Hospital {
   id: number
@@ -46,7 +46,7 @@ export function parseHospitalInput(value: unknown): HospitalInput | null {
 }
 
 export async function listHospitals(supabase?: SupabaseClient): Promise<Hospital[]> {
-  const client = supabase ?? (await createClient())
+  const client = supabase ?? createAdminClient()
   const { data, error } = await client
     .from('tb_hospital')
     .select('id, name, phone, address, patien_type, id_doctor')
@@ -64,13 +64,13 @@ export async function listHospitals(supabase?: SupabaseClient): Promise<Hospital
 }
 
 export async function createHospital(input: HospitalInput, supabase?: SupabaseClient) {
-  const client = supabase ?? (await createClient())
+  const client = supabase ?? createAdminClient()
   const { error } = await client.from('tb_hospital').insert(input)
   if (error) throw error
 }
 
 export async function updateHospital(id: number, input: HospitalInput, supabase?: SupabaseClient) {
-  const client = supabase ?? (await createClient())
+  const client = supabase ?? createAdminClient()
   const { data, error } = await client
     .from('tb_hospital')
     .update(input)
@@ -82,7 +82,7 @@ export async function updateHospital(id: number, input: HospitalInput, supabase?
 }
 
 export async function deleteHospital(id: number, supabase?: SupabaseClient) {
-  const client = supabase ?? (await createClient())
+  const client = supabase ?? createAdminClient()
   const { error: visitsError } = await client.from('tb_pet_hospital').delete().eq('id_hospital', id)
   if (visitsError) throw visitsError
 

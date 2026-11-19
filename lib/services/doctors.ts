@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export interface Doctor {
   id: number
@@ -32,7 +32,7 @@ export function parseDoctorInput(value: unknown): DoctorInput | null {
 }
 
 export async function listDoctors(supabase?: SupabaseClient): Promise<Doctor[]> {
-  const client = supabase ?? (await createClient())
+  const client = supabase ?? createAdminClient()
   const { data, error } = await client
     .from('tb_doctor')
     .select('id, name, phone, address')
@@ -48,13 +48,13 @@ export async function listDoctors(supabase?: SupabaseClient): Promise<Doctor[]> 
 }
 
 export async function createDoctor(input: DoctorInput, supabase?: SupabaseClient) {
-  const client = supabase ?? (await createClient())
+  const client = supabase ?? createAdminClient()
   const { error } = await client.from('tb_doctor').insert(input)
   if (error) throw error
 }
 
 export async function updateDoctor(id: number, input: DoctorInput, supabase?: SupabaseClient) {
-  const client = supabase ?? (await createClient())
+  const client = supabase ?? createAdminClient()
   const { data, error } = await client
     .from('tb_doctor')
     .update(input)
@@ -66,7 +66,7 @@ export async function updateDoctor(id: number, input: DoctorInput, supabase?: Su
 }
 
 export async function deleteDoctor(id: number, supabase?: SupabaseClient) {
-  const client = supabase ?? (await createClient())
+  const client = supabase ?? createAdminClient()
   const { data, error } = await client
     .from('tb_doctor')
     .delete()

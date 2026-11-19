@@ -1,13 +1,9 @@
-import { getAuthenticatedClient } from '@/lib/api-auth'
 import { createPet, listPets, parsePetInput } from '@/lib/services/pets'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET() {
-  const session = await getAuthenticatedClient()
-  if (!session) return NextResponse.json({ error: 'Debes iniciar sesión.' }, { status: 401 })
-
   try {
-    const pets = await listPets(session.supabase)
+    const pets = await listPets()
     return NextResponse.json(pets)
   } catch {
     return NextResponse.json({ error: 'No se pudieron cargar las mascotas.' }, { status: 500 })
@@ -15,9 +11,6 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const session = await getAuthenticatedClient()
-  if (!session) return NextResponse.json({ error: 'Debes iniciar sesión.' }, { status: 401 })
-
   let body: unknown
   try {
     body = await request.json()
@@ -29,7 +22,7 @@ export async function POST(request: NextRequest) {
   if (!input) return NextResponse.json({ error: 'Revisa los campos del formulario.' }, { status: 400 })
 
   try {
-    await createPet(input, session.supabase)
+    await createPet(input)
     return NextResponse.json({ success: true }, { status: 201 })
   } catch (error) {
     const code = (error as { code?: string })?.code

@@ -1,17 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
-import {
-  BarChart3,
-  Building2,
-  LayoutDashboard,
-  Mail,
-  LogOut,
-  PawPrint,
-  Stethoscope,
-} from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import { BarChart3, Building2, LayoutDashboard, PawPrint, Stethoscope } from 'lucide-react'
 import type { ReactNode } from 'react'
 
 const navItems = [
@@ -20,7 +11,6 @@ const navItems = [
   { href: '/doctors', label: 'Veterinarios', icon: Stethoscope },
   { href: '/hospitals', label: 'Hospitales', icon: Building2 },
   { href: '/reports', label: 'Reportes', icon: BarChart3 },
-  { href: '/team', label: 'Equipo', icon: Mail, adminOnly: true },
 ]
 
 const pageTitles: Record<string, string> = {
@@ -29,28 +19,10 @@ const pageTitles: Record<string, string> = {
   '/doctors': 'Veterinarios',
   '/hospitals': 'Hospitales',
   '/reports': 'Reportes',
-  '/team': 'Equipo',
 }
 
-export function DashboardShell({
-  children,
-  email,
-  role,
-}: {
-  children: ReactNode
-  email: string
-  role: 'admin' | 'staff'
-}) {
+export function DashboardShell({ children }: { children: ReactNode }) {
   const pathname = usePathname()
-  const router = useRouter()
-  const initials = email.split('@')[0]?.slice(0, 2).toUpperCase() || 'PM'
-
-  async function handleSignOut() {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    router.replace('/auth/login')
-    router.refresh()
-  }
 
   return (
     <div className="min-h-screen bg-cream text-ink">
@@ -67,7 +39,7 @@ export function DashboardShell({
 
         <p className="mb-3 px-3 text-[10px] font-bold uppercase tracking-[0.18em] text-white/45">Espacio de trabajo</p>
         <nav aria-label="Navegación principal" className="flex flex-col gap-1">
-          {navItems.filter((item) => !item.adminOnly || role === 'admin').map(({ href, label, icon: Icon }) => {
+          {navItems.map(({ href, label, icon: Icon }) => {
             const active = pathname === href
             return (
               <Link
@@ -93,29 +65,12 @@ export function DashboardShell({
 
       <div className="min-h-screen lg:pl-64">
         <header className="sticky top-0 z-10 border-b border-forest/10 bg-cream/95 px-4 py-3 backdrop-blur sm:px-8 lg:px-10">
-          <div className="flex items-center justify-between gap-4">
-            <div className="min-w-0">
-              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">Pet Manager</p>
-              <h1 className="truncate text-lg font-semibold text-forest">{pageTitles[pathname] ?? 'Clínica'}</h1>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="hidden max-w-48 truncate text-sm text-muted sm:block">{email}</span>
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-sage text-xs font-bold text-forest" aria-label={`Cuenta de ${email}`}>
-                {initials}
-              </span>
-              <button
-                type="button"
-                onClick={handleSignOut}
-                className="flex size-9 items-center justify-center rounded-xl text-muted transition hover:bg-white hover:text-forest focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest"
-                aria-label="Cerrar sesión"
-                title="Cerrar sesión"
-              >
-                <LogOut size={18} aria-hidden="true" />
-              </button>
-            </div>
+          <div className="min-w-0">
+            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">Pet Manager</p>
+            <h1 className="truncate text-lg font-semibold text-forest">{pageTitles[pathname] ?? 'Clínica'}</h1>
           </div>
           <nav aria-label="Navegación móvil" className="mt-3 flex gap-2 overflow-x-auto pb-1 lg:hidden">
-            {navItems.filter((item) => !item.adminOnly || role === 'admin').map(({ href, label, icon: Icon }) => (
+            {navItems.map(({ href, label, icon: Icon }) => (
               <Link
                 key={href}
                 href={href}

@@ -1,4 +1,3 @@
-import { getAuthenticatedClient } from '@/lib/api-auth'
 import { deleteDoctor, parseDoctorInput, updateDoctor } from '@/lib/services/doctors'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -10,9 +9,6 @@ function parseId(raw: string) {
 }
 
 export async function PATCH(request: NextRequest, { params }: RouteContext) {
-  const session = await getAuthenticatedClient()
-  if (!session) return NextResponse.json({ error: 'Debes iniciar sesión como personal autorizado.' }, { status: 401 })
-
   const id = parseId((await params).id)
   if (!id) return NextResponse.json({ error: 'Veterinario no encontrado.' }, { status: 404 })
 
@@ -26,7 +22,7 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
   if (!input) return NextResponse.json({ error: 'Revisa los campos del formulario.' }, { status: 400 })
 
   try {
-    const updated = await updateDoctor(id, input, session.supabase)
+    const updated = await updateDoctor(id, input)
     if (!updated) return NextResponse.json({ error: 'Veterinario no encontrado.' }, { status: 404 })
     return NextResponse.json({ success: true })
   } catch {
@@ -35,14 +31,11 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
 }
 
 export async function DELETE(_request: NextRequest, { params }: RouteContext) {
-  const session = await getAuthenticatedClient()
-  if (!session) return NextResponse.json({ error: 'Debes iniciar sesión como personal autorizado.' }, { status: 401 })
-
   const id = parseId((await params).id)
   if (!id) return NextResponse.json({ error: 'Veterinario no encontrado.' }, { status: 404 })
 
   try {
-    const deleted = await deleteDoctor(id, session.supabase)
+    const deleted = await deleteDoctor(id)
     if (!deleted) return NextResponse.json({ error: 'Veterinario no encontrado.' }, { status: 404 })
     return NextResponse.json({ success: true })
   } catch (error) {

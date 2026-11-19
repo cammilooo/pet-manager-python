@@ -1,13 +1,9 @@
-import { getAuthenticatedClient } from '@/lib/api-auth'
 import { deletePet, parsePetInput, updatePet } from '@/lib/services/pets'
 import { NextRequest, NextResponse } from 'next/server'
 
 type RouteContext = { params: Promise<{ id: string }> }
 
 export async function PATCH(request: NextRequest, { params }: RouteContext) {
-  const session = await getAuthenticatedClient()
-  if (!session) return NextResponse.json({ error: 'Debes iniciar sesión.' }, { status: 401 })
-
   const id = Number((await params).id)
   if (!Number.isInteger(id) || id < 1) return NextResponse.json({ error: 'Mascota no encontrada.' }, { status: 404 })
 
@@ -22,7 +18,7 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
   if (!input) return NextResponse.json({ error: 'Revisa los campos del formulario.' }, { status: 400 })
 
   try {
-    const updated = await updatePet(id, input, session.supabase)
+    const updated = await updatePet(id, input)
     if (!updated) return NextResponse.json({ error: 'No se encontró una ficha compatible.' }, { status: 404 })
     return NextResponse.json({ success: true })
   } catch (error) {
@@ -35,14 +31,11 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
 }
 
 export async function DELETE(_request: NextRequest, { params }: RouteContext) {
-  const session = await getAuthenticatedClient()
-  if (!session) return NextResponse.json({ error: 'Debes iniciar sesión.' }, { status: 401 })
-
   const id = Number((await params).id)
   if (!Number.isInteger(id) || id < 1) return NextResponse.json({ error: 'Mascota no encontrada.' }, { status: 404 })
 
   try {
-    const deleted = await deletePet(id, session.supabase)
+    const deleted = await deletePet(id)
     if (!deleted) return NextResponse.json({ error: 'Mascota no encontrada.' }, { status: 404 })
     return NextResponse.json({ success: true })
   } catch {
